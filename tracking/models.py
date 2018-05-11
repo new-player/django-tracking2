@@ -8,6 +8,7 @@ from tracking.managers import VisitorManager, PageviewManager
 from tracking.settings import TRACK_USING_GEOIP
 
 from django.contrib.gis.geoip import HAS_GEOIP
+from django.utils.encoding import python_2_unicode_compatible
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIP, GeoIPException
 
@@ -16,6 +17,7 @@ GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 log = logging.getLogger(__file__)
 
 
+@python_2_unicode_compatible
 class Visitor(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
     user = models.ForeignKey(
@@ -35,6 +37,9 @@ class Visitor(models.Model):
     end_time = models.DateTimeField(null=True, editable=False)
 
     objects = VisitorManager()
+    
+    def __str__(self):
+        return self.user.__str__() if self.user else self.session_key
 
     def session_expired(self):
         """The session has ended due to session expiration."""

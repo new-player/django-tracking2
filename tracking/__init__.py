@@ -1,8 +1,8 @@
 __version_info__ = {
     'major': 0,
     'minor': 4,
-    'micro': 1,
-    'releaselevel': 'beta',
+    'micro': 0,
+    'releaselevel': 'final',
     'serial': 1
 }
 
@@ -15,3 +15,17 @@ def get_version(short=False):
 
 __version__ = get_version()
 default_app_config = 'tracking.apps.TrackingConfig'
+
+
+import os
+
+def geoip_data_download_location():
+    from django.conf import settings
+    if not settings.GEOIP_PATH:
+        directory = os.path.abspath(os.path.join(f, 'data'))
+    else:
+        directory = settings.GEOIP_PATH
+    
+    return directory
+
+    
