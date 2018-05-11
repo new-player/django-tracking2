@@ -10,11 +10,8 @@ class VisitorAdmin(admin.ModelAdmin):
         'pretty_time_on_site', 'ip_address', 'user_agent')
     list_filter = ('user', 'ip_address')
     readonly_fields=('user_agent', 'ip_address', 'start_time', 'expiry_age',\
-                     'expiry_time', 'time_on_site', 'end_time',)
+                     'expiry_time', 'time_on_site', 'end_time', 'geoip_data', )
     
-    def geo_data(self, obj):
-        return obj.geoip_data
-    geo_data.short_description = 'GeoIP Data'
 
     def session_over(self, obj):
         return obj.session_ended() or obj.session_expired()
@@ -29,7 +26,7 @@ class VisitorAdmin(admin.ModelAdmin):
     def get_list_display(self, request):
         list_display = super(VisitorAdmin, self).get_list_display(request)
         if TRACK_USING_GEOIP:
-            list_display += ('geo_data',)
+            list_display += ('geoip_data',)
         return list_display
         
 

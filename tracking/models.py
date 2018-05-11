@@ -1,5 +1,4 @@
 import logging
-
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -9,10 +8,9 @@ from tracking.settings import TRACK_USING_GEOIP
 
 from django.contrib.gis.geoip import HAS_GEOIP
 from django.utils.encoding import python_2_unicode_compatible
+from jsonfield.fields import JSONField
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIP, GeoIPException
-
-GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
 log = logging.getLogger(__file__)
 
@@ -35,6 +33,8 @@ class Visitor(models.Model):
     expiry_time = models.DateTimeField(null=True, editable=False)
     time_on_site = models.IntegerField(null=True, editable=False)
     end_time = models.DateTimeField(null=True, editable=False)
+    geoip_data = JSONField(null=True, editable=False)
+    
 
     objects = VisitorManager()
     
@@ -53,23 +53,9 @@ class Visitor(models.Model):
         return bool(self.end_time)
     session_ended.boolean = True
 
-    @property
-    def geoip_data(self):
+    def get_geoip_data(self):
         """Attempt to retrieve MaxMind GeoIP data based on visitor's IP."""
-        if not HAS_GEOIP or not TRACK_USING_GEOIP:
-            return
-
-        if not hasattr(self, '_geoip_data'):
-            self._geoip_data = None
-            try:
-                gip = GeoIP(cache=GEOIP_CACHE_TYPE)
-                self._geoip_data = gip.city(self.ip_address)
-            except GeoIPException:
-                msg = 'Error getting GeoIP data for IP "{0}"'.format(
-                    self.ip_address)
-                log.exception(msg)
-
-        return self._geoip_data
+        return self.geoip_data
 
     class Meta(object):
         ordering = ('-start_time',)

@@ -1,7 +1,15 @@
 from __future__ import division
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
+from django.contrib.gis.geoip import HAS_GEOIP
+from tracking.settings import TRACK_USING_GEOIP
+if HAS_GEOIP:
+    from django.contrib.gis.geoip import GeoIP, GeoIPException
+
+
+GEOIP_CACHE_TYPE = getattr(settings, 'GEOIP_CACHE_TYPE', 4)
 
 headers = (
     'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED',
@@ -20,6 +28,22 @@ def get_ip_address(request):
                 return ip
             except ValidationError:
                 pass
+
+
+def get_geo_ip_data(ip_address):
+    if not HAS_GEOIP or not TRACK_USING_GEOIP:
+        return
+    
+    geoip_data = None
+    try:
+        gip = GeoIP(cache=GEOIP_CACHE_TYPE)
+        geoip_data = gip.city(ip_address)
+    except GeoIPException as e:
+        msg = 'Error getting GeoIP data for IP "{0}"'.format(
+            ip_address)
+        log.exception(msg)
+
+    return geoip_data
 
 
 def total_seconds(delta):

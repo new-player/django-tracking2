@@ -12,7 +12,7 @@ except ImportError:
     MiddlewareMixin = object
 
 from tracking.models import Visitor, Pageview
-from tracking.utils import get_ip_address, total_seconds
+from tracking.utils import get_ip_address, total_seconds, get_geo_ip_data
 from tracking.settings import (
     TRACK_AJAX_REQUESTS,
     TRACK_ANONYMOUS_USERS,
@@ -22,6 +22,7 @@ from tracking.settings import (
     TRACK_PAGEVIEWS,
     TRACK_QUERY_STRING,
     TRACK_REFERER,
+    TRACK_USING_GEOIP,
 )
 
 track_ignore_urls = [re.compile(x) for x in TRACK_IGNORE_URLS]
@@ -86,6 +87,9 @@ class VisitorTrackingMiddleware(MiddlewareMixin):
             # `default` value
             ip_address = get_ip_address(request)
             visitor = Visitor(pk=session_key, ip_address=ip_address)
+            if TRACK_USING_GEOIP:
+                visitor.geoip_data = get_geo_ip_data(visitor.ip_address)
+
 
         # Update the user field if the visitor user is not set. This
         # implies authentication has occured on this request and now
