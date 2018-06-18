@@ -9,7 +9,7 @@ class VisitorAdmin(admin.ModelAdmin):
     list_display = ('session_key', 'user', 'start_time', 'session_over',
         'pretty_time_on_site', 'ip_address', 'user_agent')
     list_filter = ('user',)
-    search_fields = ('session_key', 'user__email', 'user_agent',)
+    search_fields = ('session_key', 'user__email', 'user__username', 'user_agent',)
 
     readonly_fields=('user_agent', 'ip_address', 'start_time', 'expiry_age',\
                      'expiry_time', 'time_on_site', 'end_time', 'geoip_data', )
