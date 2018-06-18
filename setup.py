@@ -8,6 +8,9 @@ kwargs = {
         'django>=1.8',
         'django-jsonfield>=1.0.1',
     ],
+    'dependency_links': [
+        'git+https://github.com/new-player/django-tracking2#egg=django-tracking2'
+    ],
     'name': 'django-tracking2',
     'version': __import__('tracking').get_version(),
     'author': 'Byron Ruth',
@@ -16,7 +19,7 @@ kwargs = {
                     'and registered users spend on your site'),
     'license': 'BSD',
     'keywords': 'visitor tracking time analytics',
-    'url': 'https://github.com/bruth/django-tracking2',
+    'url': 'https://github.com/new-player/django-tracking2',
     'classifiers': [
         'Development Status :: 5 - Production/Stable',
         'Framework :: Django',
